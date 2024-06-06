@@ -2,14 +2,7 @@ package models
 
 import java.util.{Date, UUID}
 
-case class Account(
-                      accountKey: UUID,
-                      fullname: String,
-                      email: String,
-                      password: String,
-                      createdAt: Date,
-                      profilePic: UUID
-                  )
+case class Account(accountKey: UUID, fullname: String, email: String, password: String, createdAt: Date, profilePic: UUID)
 
 object Account {
     def unapply(acc: Account): Option[(UUID, String, String, String, Date, UUID)] =

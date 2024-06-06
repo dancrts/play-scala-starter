@@ -3,16 +3,9 @@
 # https://www.playframework.com/documentation/latest/ScalaRouting
 # ~~~~
 
-OPTIONS /                           controllers.HomeController.options
-
 GET     /                           controllers.HomeController.index()
-GET     /ws                         controllers.HomeController.socket
-POST    /ws                         controllers.HomeController.socket
-GET     /webhook                    controllers.HomeController.webhook()
-
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
 
-POST    /message                    controllers.HomeController.getMessage
-
-
-
+POST    /message                    controllers.api.chat.ChatController.getMessage
+GET     /ws                         controllers.api.chat.ChatController.socket
+POST    /ws                         controllers.api.chat.ChatController.socket

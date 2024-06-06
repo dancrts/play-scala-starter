@@ -1,5 +1,9 @@
 package controllers.api.chat
 
-trait ChatController {
+import play.api.mvc.{Action, AnyContent, WebSocket}
 
+trait ChatController {
+    def getMessage: Action[AnyContent]
+
+    def socket: WebSocket
 }

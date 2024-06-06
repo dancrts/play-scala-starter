@@ -20,6 +20,7 @@ lazy val qrsofResolver = Seq(
 lazy val thirdPartyLibraries = Seq(
     "net.codingwell" %% "scala-guice" % "6.0.0",
     "org.playframework" %% "play-slick" % "6.1.0",
+    "org.playframework" %% "play-slick-evolutions" % "6.1.0",
     "org.mindrot" % "jbcrypt" % "0.4",
     "com.github.jwt-scala" %% "jwt-core" % "10.0.1",
     "com.github.jwt-scala" %% "jwt-play-json" % "10.0.1",
