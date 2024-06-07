@@ -8,15 +8,11 @@ import slick.lifted.ProvenShape
 
 import java.util.{Date, UUID}
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
-class MessageDAO  @Inject()(
-                               @NamedDatabase("chaapy") protected val dbConfigProvider: DatabaseConfigProvider
-                           )
-                           (
-                               implicit executionContext: ExecutionContext
-                           )
-    extends HasDatabaseConfigProvider[JdbcProfile]{
+class MessageDAO  @Inject()(@NamedDatabase("chaapy") protected val dbConfigProvider: DatabaseConfigProvider)(
+    implicit executionContext: ExecutionContext
+) extends HasDatabaseConfigProvider[JdbcProfile] {
 
     import profile.api._
 
@@ -30,12 +26,24 @@ class MessageDAO  @Inject()(
 
         def senderKey: Rep[UUID] = column[UUID]("SENDER_KEY")
 
-        def receiverKey: Rep[UUID] = column[UUID]("RECEIVER_KEY")
+        def conversationKey: Rep[UUID] = column[UUID]("CONVERSATION_KEY")
 
         def createdAt: Rep[Date] = column[Date]("CREATED_AT")
 
-        override def * : ProvenShape[Message] = (key, content, senderKey, receiverKey, createdAt) <> (Message.tupled, Message.unapply _)
+        override def * : ProvenShape[Message] = (key, content, senderKey, conversationKey, createdAt) <> (Message.tupled, Message.unapply _)
+    }
+    private val messageTable = TableQuery[MessageTable]
+
+    def save(message: Message): Future[Message] = {
+        val insertQuery = messageTable.returning(messageTable) += message
+        db.run(insertQuery)
     }
 
+    def updateMessage(message: Message) = ???
 
+    def deleteMessage(messageKey: UUID) = ???
+
+    def getAll(accountKey: UUID) = ???
+
+    def getConversation(userOne: UUID, userTwo: UUID) = ???
 }

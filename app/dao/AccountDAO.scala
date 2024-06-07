@@ -8,17 +8,14 @@ import slick.jdbc.JdbcProfile
 import slick.lifted.ProvenShape
 
 import java.util.{Date, UUID}
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-class AccountDAO @Inject() (
-                               @NamedDatabase("chaapy") protected val dbConfigProvider: DatabaseConfigProvider
-                           )
-                           (
-                               implicit executionContext: ExecutionContext
-                           )
-    extends HasDatabaseConfigProvider[JdbcProfile] {
+@Singleton
+class AccountDAO @Inject() (@NamedDatabase("chaapy") protected val dbConfigProvider: DatabaseConfigProvider)(
+    implicit executionContext: ExecutionContext
+) extends HasDatabaseConfigProvider[JdbcProfile] {
 
     import profile.api._
 
@@ -36,14 +33,14 @@ class AccountDAO @Inject() (
 
         def createdAt: Rep[Date] = column[Date]("CREATED_AT")
 
-        def profilePic: Rep[UUID] = column[UUID]("PROFILE_PIC")
+        def profilePic: Rep[Option[UUID]] = column[Option[UUID]]("PROFILE_PIC")
 
         override def * : ProvenShape[Account] = (accountKey, fullname, email, password, createdAt, profilePic) <> (Account.tupled, Account.unapply _)
     }
 
     private val accountTable = TableQuery[AccountTable]
 
-    def create(account: Account): Future[Account] = {
+    def createAccount(account: Account): Future[Account] = {
         val newAccount = account.copy(password = encryptPw(account.password))
         val insertedAccountQuery = accountTable.returning(accountTable) += newAccount
         db.run(insertedAccountQuery)

@@ -11,13 +11,9 @@ import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
 
-class WorkspaceDAO @Inject()(
-                                @NamedDatabase("chaapy") protected val dbConfigProvider: DatabaseConfigProvider
-                            )
-                            (
-                                implicit executionContext: ExecutionContext
-                            )
-    extends HasDatabaseConfigProvider[JdbcProfile]{
+class WorkspaceDAO @Inject()(@NamedDatabase("chaapy") protected val dbConfigProvider: DatabaseConfigProvider)(
+    implicit executionContext: ExecutionContext
+) extends HasDatabaseConfigProvider[JdbcProfile]{
 
     import profile.api._
 
@@ -41,4 +37,16 @@ class WorkspaceDAO @Inject()(
 
         override def * : ProvenShape[Workspace] = (key, name, description, imageKey, color, modifiedAt, createdAt) <> (Workspace.tupled, Workspace.unapply _)
     }
+
+    private val workspaceTable = TableQuery[WorkspaceTable]
+
+    def createWorkspace(workspace: Workspace) = ???
+
+    def updateWorkspace(workspace: Workspace) = ???
+
+    def updateIcon(imageKey: UUID) = ???
+
+    def deleteWorkspace(workspaceKey: UUID) = ???
+
+
 }

@@ -1,4 +1,5 @@
 import com.google.inject.AbstractModule
+import controllers.api.auth.{AuthController, AuthImplementation}
 import controllers.api.chat._
 
 import javax.inject._
@@ -9,5 +10,6 @@ class Module(environment: Environment, configuration: Configuration) extends Abs
 
     override def configure(): Unit = {
         bind[ChatController].to[ChatImplementation].in[Singleton]()
+        bind[AuthController].to[AuthImplementation].in[Singleton]()
     }
 }
