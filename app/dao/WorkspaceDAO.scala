@@ -17,7 +17,7 @@ class WorkspaceDAO @Inject()(@NamedDatabase("chaapy") protected val dbConfigProv
 
     import profile.api._
 
-    class WorkspaceTable(tag: Tag) extends Table[Workspace](tag, "Workspace") {
+    class WorkspaceTable(tag: Tag) extends Table[Workspace](tag, "workspaces") {
 
         implicit val dateColumnType: WorkspaceDAO.this.profile.BaseColumnType[java.util.Date] = MappedColumnType.base[Date, Long](d => d.getTime, d => new Date(d))
 

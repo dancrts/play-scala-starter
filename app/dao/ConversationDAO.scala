@@ -17,7 +17,9 @@ class ConversationDAO @Inject()(@NamedDatabase("chaapy") protected val dbConfigP
 
     import profile.api._
 
-    private class ConversationTable(tag: Tag) extends Table[Conversation](_tableTag = tag, _tableName = "Conversation") {
+    private class ConversationTable(tag: Tag) extends Table[Conversation](_tableTag = tag, _tableName = "conversations") {
+
+        implicit val dateColumnType: ConversationDAO.this.profile.BaseColumnType[java.util.Date] = MappedColumnType.base[Date, Long](d => d.getTime, d => new Date(d))
 
         def key: Rep[UUID] = column[UUID]("CONVERSATION_KEY", O.PrimaryKey)
 
@@ -25,7 +27,9 @@ class ConversationDAO @Inject()(@NamedDatabase("chaapy") protected val dbConfigP
 
         def participant2: Rep[UUID] = column[UUID]("PARTICIPANT_TWO")
 
-        override def * : ProvenShape[Conversation] = ???
+        def createdAt: Rep[Date] = column[Date]("CREATED_AT")
+
+        override def * : ProvenShape[Conversation] = (key, participant1, participant2, createdAt) <> (Conversation.tupled, Conversation.unapply _)
     }
 
     private val conversationTable = TableQuery[ConversationTable]

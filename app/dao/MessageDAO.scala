@@ -16,7 +16,7 @@ class MessageDAO  @Inject()(@NamedDatabase("chaapy") protected val dbConfigProvi
 
     import profile.api._
 
-    private class MessageTable (tag: Tag) extends Table[Message](tag, "Message") {
+    private class MessageTable (tag: Tag) extends Table[Message](tag, "messages") {
 
         implicit val dateColumnType: MessageDAO.this.profile.BaseColumnType[java.util.Date] = MappedColumnType.base[Date, Long](d => d.getTime, d => new Date(d))
 

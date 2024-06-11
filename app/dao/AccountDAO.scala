@@ -19,31 +19,29 @@ class AccountDAO @Inject() (@NamedDatabase("chaapy") protected val dbConfigProvi
 
     import profile.api._
 
-    private class AccountTable(tag: Tag) extends Table[Account](tag, "Account") {
+    private class AccountTable(tag: Tag) extends Table[Account](tag, "accounts") {
 
         implicit val dateColumnType: AccountDAO.this.profile.BaseColumnType[java.util.Date] = MappedColumnType.base[Date, Long](d => d.getTime, d => new Date(d))
 
-        def accountKey: Rep[UUID] = column[UUID]("ACCOUNT_KEY", O.PrimaryKey)
+        def accountKey: Rep[UUID] = column[UUID]("account_key", O.PrimaryKey)
 
-        def fullname: Rep[String] = column[String]("FULL_NAME")
+        def fullname: Rep[String] = column[String]("fullname")
 
-        def email: Rep[String] = column[String]("EMAIL", O.Unique)
+        def email: Rep[String] = column[String]("email", O.Unique)
 
-        def password: Rep[String] = column[String]("Password")
+        def password: Rep[String] = column[String]("password")
 
-        def createdAt: Rep[Date] = column[Date]("CREATED_AT")
+        def profilePic: Rep[Option[UUID]] = column[Option[UUID]]("profile_pic")
 
-        def profilePic: Rep[Option[UUID]] = column[Option[UUID]]("PROFILE_PIC")
-
-        override def * : ProvenShape[Account] = (accountKey, fullname, email, password, createdAt, profilePic) <> (Account.tupled, Account.unapply _)
+        override def * : ProvenShape[Account] = (accountKey, fullname, email, password, profilePic) <> (Account.tupled, Account.unapply _)
     }
 
     private val accountTable = TableQuery[AccountTable]
 
-    def createAccount(account: Account): Future[Account] = {
+    def createAccount(account: Account): Account = {
         val newAccount = account.copy(password = encryptPw(account.password))
         val insertedAccountQuery = accountTable.returning(accountTable) += newAccount
-        db.run(insertedAccountQuery)
+        Await.result(db.run(insertedAccountQuery),Duration.Inf)
     }
 
     def updateAccount(account: Account): Future[Int] = {
@@ -76,7 +74,7 @@ class AccountDAO @Inject() (@NamedDatabase("chaapy") protected val dbConfigProvi
         }
     }
 
-    private def findByEmail(email: String): Option[Account] = {
+    def findByEmail(email: String): Option[Account] = {
         val findQuery = accountTable.filter(_.email === email).result.headOption
         Await.result(db.run(findQuery),Duration.Inf)
     }
