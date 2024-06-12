@@ -8,8 +8,8 @@ lazy val qrsofDependencies = Seq(
     "com.qrsof.core.api" %% "swagger" % "1.0.0-01-SNAPSHOT",
     "com.qrsof.core" %% "app-models" % "1.0.0-06-SNAPSHOT",
     "com.qrsof.core" %% "json-jackson" % "1.0.0-05-SNAPSHOT",
-//    "com.qrsof.core" %% "jwt" % "3.0.0-SNAPSHOT",
-//    "com.qrsof.core" %% "app-core" % "2.0.0-SNAPSHOT",
+    "com.qrsof.core" %% "jwt" % "4.0.0-01-SNAPSHOT",
+    "com.qrsof.core" %% "app-core" % "3.0.0-SNAPSHOT",
     "com.qrsof.core.storage" % "storage-digital-ocean" % "2.0.0-00-SNAPSHOT",
     "com.qrsof.libs.storage" % "storage-file-system" % "2.0.0-00-SNAPSHOT",
 )

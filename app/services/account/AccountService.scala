@@ -1,17 +1,14 @@
 package services.account
 
-import dao.AccountDAO
-import services.account.dto.{AuthRequest, GoogleLoginRequest}
 import com.fasterxml.uuid.Generators
-import models.Account
-import io.scalaland.chimney.dsl.TransformerOps
-
-import java.util.{Date, UUID}
+import java.util.UUID
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.{Await, ExecutionContext, Future}
-import scala.concurrent.duration.Duration
-import scala.concurrent.impl.Promise
-import scala.util.{Failure, Success}
+import com.qrsof.jwt.models.{DecodedToken, JwtToken}
+import com.qrsof.jwt.validation.JwtValidationService
+import dao.AccountDAO
+import models.Account
+import services.account.dto.{AuthRequest, GoogleLoginRequest}
+import services.account.AccountException
 
 @Singleton
 class AccountService @Inject()(accountDAO: AccountDAO) {
@@ -36,7 +33,11 @@ class AccountService @Inject()(accountDAO: AccountDAO) {
     }
 
     def googleLogin(gLoginRequest: GoogleLoginRequest): Unit = {
-
+        println(gLoginRequest)
+//        accountDAO.findByEmail(gLoginRequest.userInformation.email) match {
+//            case Some(account) => println(account)
+//            case None => println("No acc")
+//        }
     }
 
     private def generateKey(): UUID = Generators.timeBasedGenerator().generate()
