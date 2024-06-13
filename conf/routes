@@ -11,5 +11,6 @@ GET     /ws                         controllers.api.chat.ChatController.socket
 POST    /ws                         controllers.api.chat.ChatController.socket
 
 
-POST    /auth/register                controllers.api.auth.AuthController.register
-POST    /auth/login                controllers.api.auth.AuthController.login
+POST    /auth/register              controllers.api.auth.AuthController.register
+
+POST    /auth/login                 controllers.api.auth.AuthController.login

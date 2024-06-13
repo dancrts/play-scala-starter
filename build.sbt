@@ -3,7 +3,6 @@ organization := "qrsof.com"
 version := "1.0-SNAPSHOT"
 scalaVersion := "2.13.14"
 
-
 lazy val qrsofDependencies = Seq(
     "com.qrsof.core.api" %% "swagger" % "1.0.0-01-SNAPSHOT",
     "com.qrsof.core" %% "app-models" % "1.0.0-06-SNAPSHOT",

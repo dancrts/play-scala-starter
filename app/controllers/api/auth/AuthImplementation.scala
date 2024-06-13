@@ -16,6 +16,8 @@ import services.account.dto._
 class AuthImplementation @Inject()(accountService: AccountService ,val controllerComponents: ControllerComponents)
     extends AuthController with BaseController {
 
+    implicit val formatAccount: OFormat[Account] = Json.format[Account]
+
     private val authForm: Form[AuthRequest] = Form(
         mapping(
             "email" -> nonEmptyText,
@@ -65,7 +67,7 @@ class AuthImplementation @Inject()(accountService: AccountService ,val controlle
             data => {
                 accountService.logIn(data) match {
                     case Right(exception) => BadRequest("")
-                    case Left(acc) => Ok(acc.toString)
+                    case Left(acc) => Ok(Json.toJson(acc))
                 }
             }
         )
