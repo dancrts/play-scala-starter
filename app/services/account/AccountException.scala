@@ -1,10 +1,9 @@
 package services.account
 
-import com.qrsof.exceptions.{ApplicationException, ErrorCode}
+import models.ErrorCode
 import services.account.AccountErrorCodes._
 
-
-sealed abstract class AccountException(errorCode: ErrorCode) extends ApplicationException(errorCode)
+abstract class AccountException(val errorCode: ErrorCode)
 
 object AccountException {
     case class AccountNotFoundException(resource: String) extends AccountException(AccountNotFound(resource))

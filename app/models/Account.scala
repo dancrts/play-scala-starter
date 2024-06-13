@@ -1,6 +1,6 @@
 package models
 
-import java.util.{Date, UUID}
+import java.util.UUID
 
 case class Account(accountKey: UUID, fullname: String, email: String, password: String, profilePic: Option[UUID] )
 

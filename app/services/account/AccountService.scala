@@ -1,6 +1,7 @@
 package services.account
 
 import com.fasterxml.uuid.Generators
+
 import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import com.qrsof.jwt.models.{DecodedToken, JwtToken}
@@ -9,24 +10,26 @@ import dao.AccountDAO
 import models.Account
 import services.account.dto.{AuthRequest, GoogleLoginRequest}
 import services.account.AccountException
+import services.account.AccountException._
 
 @Singleton
 class AccountService @Inject()(accountDAO: AccountDAO) {
 
-    def logIn(loginReq: AuthRequest): Either[Account, String] = {
+    def logIn(loginReq: AuthRequest): Either[Account, AccountException] = {
         accountDAO.findAndValidate(loginReq.email, loginReq.password) match {
             case Some(account) => Left(account)
-            case None => Right("No hay ninguna cuenta")
+            case None => Right(AccountNotFoundException(loginReq.email))
+
         }
     }
 
-    def register(authReq: AuthRequest): Either[UUID, String] = {
+    def register(authReq: AuthRequest): Either[AccountException, UUID] = {
         val newAccount = Account(generateKey(), authReq.email, authReq.email, authReq.password, None)
         accountDAO.findByEmail(authReq.email) match {
-            case Some(value) => Right("Imposible de Crear")
+            case Some(value) => Left(UserAlreadyExistsException(authReq.email))
             case None =>
-                val newAcc = accountDAO.createAccount(newAccount)
-                Left(newAcc.accountKey)
+                val createdAcc = accountDAO.createAccount(newAccount)
+                Right(createdAcc.accountKey)
         }
 
 

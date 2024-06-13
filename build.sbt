@@ -27,6 +27,8 @@ lazy val thirdPartyLibraries = Seq(
     "org.mindrot" % "jbcrypt" % "0.4",
     "com.github.jwt-scala" %% "jwt-core" % "10.0.1",
     "com.github.jwt-scala" %% "jwt-play-json" % "10.0.1",
+    "org.apache.pekko" %% "pekko-http" % "1.0.1",
+    "org.apache.pekko" %% "pekko-http-spray-json" % "1.0.1",
 )
 
 lazy val testLibraries = Seq(
