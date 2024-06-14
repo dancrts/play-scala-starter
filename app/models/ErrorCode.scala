@@ -22,4 +22,6 @@ object ErrorCode {
         override val detail: Option[String] = detailValue
     }
 
+    def unapply(err: ErrorCode): Option[(String, String, Option[String])] =
+        Some((err.code, err.title, err.detail))
 }

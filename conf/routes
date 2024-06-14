@@ -13,5 +13,5 @@ POST    /ws                         controllers.api.chat.ChatController.socket
 POST    /auth/register              controllers.api.auth.AuthController.register
 POST    /auth/login                 controllers.api.auth.AuthController.login
 
-POST    /onboarding/create          controllers.api.onboarding.OnboardingImplementation.upload
+POST    /onboarding/create          controllers.api.onboarding.OnboardingImplementation.saveWorkspaceAndProfile
 GET     /onboarding/:userKey        controllers.api.onboarding.OnboardingImplementation.getUserMetadata(userKey)

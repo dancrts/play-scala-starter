@@ -3,9 +3,13 @@ package services.account
 import models.ErrorCode
 import services.account.AccountErrorCodes._
 
-abstract class AccountException(val errorCode: ErrorCode)
+abstract class AccountException(val errorCode: ErrorCode) {}
 
 object AccountException {
+    def apply(errorCode: ErrorCode): AccountException = new AccountException(errorCode) {}
+
+    def unapply(accEx: AccountException): Option[ErrorCode] = Some(accEx.errorCode)
+
     case class AccountNotFoundException(resource: String) extends AccountException(AccountNotFound(resource))
 
     case class AppNotFoundException(appKey: String) extends AccountException(AppNotFound(appKey))

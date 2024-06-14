@@ -1,8 +1,6 @@
 package controllers.api.auth
 
 import javax.inject._
-import org.apache.pekko.actor.ActorSystem
-import org.apache.pekko.stream.Materializer
 import play.api.mvc._
 import play.api.data.Form
 import play.api.data.Forms._
@@ -16,6 +14,8 @@ import services.account.dto._
 class AuthImplementation @Inject()(accountService: AccountService ,val controllerComponents: ControllerComponents)
     extends AuthController with BaseController {
 
+    implicit val formatError: OFormat[ErrorCode] = Json.format[ErrorCode]
+    implicit val formatException: OFormat[AccountException] = Json.format[AccountException]
     implicit val formatAccount: OFormat[Account] = Json.format[Account]
 
     private val authForm: Form[AuthRequest] = Form(
@@ -49,7 +49,7 @@ class AuthImplementation @Inject()(accountService: AccountService ,val controlle
             },
             data => {
                 accountService.register(data) match {
-                    case Left(exception) => BadRequest("")
+                    case Left(exception) => BadRequest(Json.toJson(exception))
                     case Right(accId) => Ok(Json.obj("account" -> accId))
                 }
 
@@ -66,7 +66,7 @@ class AuthImplementation @Inject()(accountService: AccountService ,val controlle
             },
             data => {
                 accountService.logIn(data) match {
-                    case Right(exception) => BadRequest("")
+                    case Right(exception) => BadRequest(Json.toJson(exception))
                     case Left(acc) => Ok(Json.toJson(acc))
                 }
             }
@@ -76,6 +76,7 @@ class AuthImplementation @Inject()(accountService: AccountService ,val controlle
     override def loginWithGoogle: Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
         googleLoginForm.bindFromRequest().fold(
             errors => {
+                println(errors.errors.toString())
                 BadRequest("Error!")
             },
             data => {

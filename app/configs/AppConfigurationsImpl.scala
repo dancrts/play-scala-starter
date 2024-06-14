@@ -2,16 +2,19 @@ package configs
 
 import com.typesafe.config.{Config, ConfigFactory}
 import configs.AppEnvironment._
+import play.api.Configuration
 
-class AppConfigurationsImpl extends AppConfigurations {
+import javax.inject.{Inject, Singleton}
 
-    private val config: Config = ConfigFactory.defaultApplication().resolve()
+@Singleton
+class AppConfigurationsImpl @Inject()(config: Configuration) extends AppConfigurations {
 
-    override def dbSchemaName: String = config.getString("db.schema")
+    override def dbSchemaName: String = config.get[String]("db.schema")
 
     override def environment: AppEnvironment = {
-        if (config.hasPath("app.environment")) {
-            val env = config.getString("app.environment")
+        if (config.has("app.environment")) {
+            println("HasEnv")
+            val env = config.get[String]("app.environment")
             env match {
                 case "production" => Production
                 case "sandbox" => Sandbox
@@ -25,6 +28,6 @@ class AppConfigurationsImpl extends AppConfigurations {
     }
 
     override def oauthConfigs: OauthConfigs = new OauthConfigs {
-        override def jwksUrl: String = config.getString("oauth.jwksUrl")
+        override def jwksUrl: String = config.get[String]("oauth.jwksUrl")
     }
 }
