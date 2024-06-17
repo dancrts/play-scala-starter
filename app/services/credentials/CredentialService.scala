@@ -1,9 +1,10 @@
-package controllers.api
+package services.credentials
 
-import play.api.mvc.RequestHeader
-import javax.inject.{Inject, Singleton}
 import com.qrsof.jwt.models.{DecodedToken, JwtToken}
 import com.qrsof.jwt.validation.JwtValidationService
+import play.api.mvc.RequestHeader
+
+import javax.inject.{Inject, Singleton}
 
 @Singleton
 class CredentialService @Inject()(jwtValidationService: JwtValidationService) {

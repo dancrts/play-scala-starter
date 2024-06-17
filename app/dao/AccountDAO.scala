@@ -49,8 +49,6 @@ class AccountDAO @Inject() (@NamedDatabase("chaapy") protected val dbConfigProvi
         db.run(updateQuery)
     }
 
-    def addProfilePicture(accKey: String, picKey: String) = ???
-
     def updateToNewPassword(accKey: String, newPw: String, oldPw: String): Future[Int] = {
         val accountID = UUID.fromString(accKey)
         val maybeAccount = findByKey(accountID)
@@ -79,7 +77,7 @@ class AccountDAO @Inject() (@NamedDatabase("chaapy") protected val dbConfigProvi
         Await.result(db.run(findQuery),Duration.Inf)
     }
 
-    private def findByKey(accountKey: UUID): Option[Account] = {
+    def findByKey(accountKey: UUID): Option[Account] = {
         val findQuery = accountTable.filter(_.accountKey === accountKey).result.headOption
         Await.result(db.run(findQuery), Duration.Inf)
     }
