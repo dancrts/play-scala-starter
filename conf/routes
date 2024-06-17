@@ -3,15 +3,20 @@
 # https://www.playframework.com/documentation/latest/ScalaRouting
 # ~~~~
 
-GET     /                           controllers.HomeController.index()
-GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
+# Public
 
-POST    /message                    controllers.api.chat.ChatController.getMessage
-GET     /ws                         controllers.api.chat.ChatController.socket
-POST    /ws                         controllers.api.chat.ChatController.socket
+GET     /                                   controllers.HomeController.index()
+GET     /assets/*file                       controllers.Assets.versioned(path="/public", file: Asset)
 
-POST    /auth/register              controllers.api.auth.AuthController.register
-POST    /auth/login                 controllers.api.auth.AuthController.login
+POST    /message                            controllers.api.chat.ChatController.getMessage
+GET     /ws                                 controllers.api.chat.ChatController.socket
+POST    /ws                                 controllers.api.chat.ChatController.socket
 
-POST    /onboarding/create          controllers.api.onboarding.OnboardingImplementation.saveWorkspaceAndProfile
-GET     /onboarding/:userKey        controllers.api.onboarding.OnboardingImplementation.getUserMetadata(userKey)
+POST    /auth/register                      controllers.api.auth.AuthController.register
+POST    /auth/login                         controllers.api.auth.AuthController.login
+
+# Secured
+
+POST    /onboarding/workspace               controllers.api.onboarding.OnboardingImplementation.saveWorkspace
+POST    /onboarding/profile                 controllers.api.onboarding.OnboardingImplementation.saveProfile
+GET     /onboarding/profile/:userKey        controllers.api.onboarding.OnboardingImplementation.getUserMetadata(userKey)

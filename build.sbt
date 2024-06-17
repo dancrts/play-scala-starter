@@ -19,7 +19,7 @@ lazy val qrsofResolver = Seq(
 )
 
 lazy val thirdPartyLibraries = Seq(
-    "io.scalaland" %% "chimney" % "1.0.0",
+    "io.scalaland" %% "chimney" % "1.1.0",
     "net.codingwell" %% "scala-guice" % "6.0.0",
     "org.playframework" %% "play-slick" % "6.1.0",
     "org.playframework" %% "play-slick-evolutions" % "6.1.0",

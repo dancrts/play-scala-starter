@@ -5,8 +5,6 @@ class ErrorCode {
     val title: String = ""
     val detail: Option[String] = None
 
-    override def toString: String = s"""|(code:$code,title:$title,detail:$detail)|""".stripMargin
-
     override def equals(obj: Any): Boolean = {
         obj match {
             case errorCode: ErrorCode => errorCode.detail.equals(this.detail) && errorCode.code.equals(this.code) && errorCode.detail.equals(this.detail)
