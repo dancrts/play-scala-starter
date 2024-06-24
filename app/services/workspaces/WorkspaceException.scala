@@ -10,7 +10,7 @@ object WorkspaceExceptions {
 
     case class WorkspaceNotFoundException(workspaceKey: String) extends WorkspaceException(WorkspaceNotFound(workspaceKey))
 
-    case class UserNotFoundException(userKey: String) extends WorkspaceException(ResourceNotFound())
+    case class UserNotFoundException(userKey: String) extends WorkspaceException(ResourceNotFound())9
 
     case class UnconfirmedUserException(userKey: String) extends WorkspaceException(UnconfirmedUser(userKey))
 

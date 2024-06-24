@@ -8,7 +8,8 @@ import slick.lifted.ProvenShape
 
 import java.util.{Date, UUID}
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 class MessageDAO  @Inject()(@NamedDatabase("chaapy") protected val dbConfigProvider: DatabaseConfigProvider)(
     implicit executionContext: ExecutionContext
@@ -34,16 +35,23 @@ class MessageDAO  @Inject()(@NamedDatabase("chaapy") protected val dbConfigProvi
     }
     private val messageTable = TableQuery[MessageTable]
 
-    def save(message: Message): Future[Message] = {
+    def save(message: Message): Message = {
         val insertQuery = messageTable.returning(messageTable) += message
-        db.run(insertQuery)
+        Await.result(db.run(insertQuery),Duration.Inf)
     }
 
-    def updateMessage(message: Message) = ???
+    def updateMessage(message: Message) = {
+        val updateQuery = messageTable.filter(_.key === message.key).update(message)
+        Await.result(db.run(updateQuery), Duration.Inf)
+    }
 
-    def deleteMessage(messageKey: UUID) = ???
+    def deleteMessage(messageKey: UUID) = {
+        val deleteQuery = messageTable.filter(_.key === messageKey).delete
+        Await.result(db.run(deleteQuery), Duration.Inf)
+    }
 
-    def getAll(accountKey: UUID) = ???
-
-    def getConversation(userOne: UUID, userTwo: UUID) = ???
+    def getAll(convKey: UUID): Seq[Message] = {
+        val searchQuery = messageTable.filter(_.conversationKey === convKey).result
+        Await.result(db.run(searchQuery) ,Duration.Inf)
+    }
 }

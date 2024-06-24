@@ -12,7 +12,8 @@ class CredentialService @Inject()(jwtValidationService: JwtValidationService) {
     def authenticateToken(req: RequestHeader): Option[DecodedToken] = {
         val authorization: Option[String] = req.headers.get("Authorization")
         authorization match {
-            case Some(token) =>
+            case Some(bearerToken) =>
+                val token = bearerToken.stripPrefix("bearer ")
                 jwtValidationService.validateJwt(JwtToken(token)) match {
                     case Left(value) => None
                     case Right(decodedToken) => Some(decodedToken)

@@ -70,7 +70,6 @@ class OnboardingImplementation @Inject()(
                 Ok(s"Hello $userKey!")
             case None => Forbidden("no token >:(")
         }
-        Ok(s"Hello $userKey!")
     }
 
     override def saveWorkspace: Action[MultipartFormData[Files.TemporaryFile]] = Action(parse.multipartFormData) { implicit request =>

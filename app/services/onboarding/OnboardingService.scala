@@ -67,6 +67,18 @@ class OnboardingService @Inject()(
 //            case Right(value) =>
 //                println(value)
 //        }
+//        accountDAO.findByKey(UUID.fromString(profileRequest.userKey)) match {
+//            case Some(account) =>
+//                val updatedAccount = account.copy(fullname = fullName, profilePic = optionStrToUUID(maybeProfileIconKey))
+//                val updatedResult = Await.result(accountDAO.updateAccount(updatedAccount), Duration.Inf)
+//                updatedResult match {
+//                    case 1 => println("it worked!")
+//                    case _ => println("it didn't work")
+//                }
+//            case None =>
+//                //this should return an exception
+//                println("None")
+//        }
         ???
     }
 

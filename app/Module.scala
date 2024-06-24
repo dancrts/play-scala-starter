@@ -1,13 +1,15 @@
 import com.google.inject.{AbstractModule, Provides}
-import com.qrsof.jwt.validation.{JwksConfigs, JwtValidationService, JwtValidationServiceImpl, RSAJwksKeyProvider, RSAKeyProvider}
-import configs.{AppConfigurations, AppConfigurationsImpl}
-import controllers.api.auth.{AuthController, AuthImplementation}
-import controllers.api.chat._
 
 import javax.inject._
 import net.codingwell.scalaguice.ScalaModule
 import play.api.{Configuration, Environment}
-
+import com.qrsof.apptack.client.impl.ApptackModule
+import com.qrsof.apptack.client.ApptackClientConfigurations
+import com.qrsof.jwt.validation.{JwksConfigs, JwtValidationService, JwtValidationServiceImpl, RSAJwksKeyProvider, RSAKeyProvider}
+import configs.{AppConfigurations, AppConfigurationsImpl}
+import controllers.api.auth.{AuthController, AuthImplementation}
+import controllers.api.chat._
+import controllers.api.onboarding.{OnboardingController, OnboardingImplementation}
 
 class Module(environment: Environment, configuration: Configuration) extends AbstractModule with ScalaModule {
 
@@ -18,8 +20,11 @@ class Module(environment: Environment, configuration: Configuration) extends Abs
 
         bind[AppConfigurations].to[AppConfigurationsImpl].in[Singleton]()
 
-        bind[ChatController].to[ChatImplementation].in[Singleton]()
         bind[AuthController].to[AuthImplementation].in[Singleton]()
+        bind[ChatController].to[ChatImplementation].in[Singleton]()
+        bind[OnboardingController].to[OnboardingImplementation].in[Singleton]()
+
+        install(new ApptackModule)
 
 //        install(new FileSystemGuiceModule())
     }
@@ -28,9 +33,12 @@ class Module(environment: Environment, configuration: Configuration) extends Abs
 
     @Provides
     def jwkConfigs(): JwksConfigs = {
-        new JwksConfigs {
-            override def jwkUlr: String = configs.oauthConfigs.jwksUrl
-        }
+        configs.jwksConfigs
+    }
+
+    @Provides
+    def apptackClientConfigurations: ApptackClientConfigurations = {
+        configs.appTackClientConfigurations
     }
 
 //    @Provides
