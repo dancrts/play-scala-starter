@@ -1,13 +1,14 @@
 package services.onboarding
 
+import com.qrsof.apptack.client.ApptackClient
 import io.scalaland.chimney.dsl.TransformationOps
+
 import javax.inject.{Inject, Singleton}
 import java.util.UUID
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.concurrent.duration.Duration
 import scala.util.Try
 import spray.json.JsValue
-
 import dao.{AccountDAO, WorkspaceDAO}
 import models.Workspace
 import services.files.FileManagementService
@@ -19,7 +20,8 @@ import services.onboarding.dto.responses.UserOnboardingResponse
 class OnboardingService @Inject()(
                                      workspaceDAO: WorkspaceDAO,
                                      accountDAO: AccountDAO,
-                                     fileManagementService: FileManagementService
+                                     fileManagementService: FileManagementService,
+                                     appTackClient: ApptackClient
                                  )(implicit ex: ExecutionContext) {
 
     def getUserMetadata(userKey: String): Either[UserOnboardingResponse, String] = {

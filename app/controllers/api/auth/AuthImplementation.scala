@@ -5,10 +5,12 @@ import play.api.mvc._
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.libs.json._
-
+import com.qrsof.jwt.models.JwtToken
 import models.{Account, ErrorCode}
+import services.account.AccountException._
 import services.account.{AccountException, AccountService}
 import services.account.dto._
+
 
 @Singleton
 class AuthImplementation @Inject()(accountService: AccountService ,val controllerComponents: ControllerComponents)
@@ -17,6 +19,7 @@ class AuthImplementation @Inject()(accountService: AccountService ,val controlle
     implicit val formatError: OFormat[ErrorCode] = Json.format[ErrorCode]
     implicit val formatException: OFormat[AccountException] = Json.format[AccountException]
     implicit val formatAccount: OFormat[Account] = Json.format[Account]
+    implicit val formatJwt: OFormat[JwtToken] = Json.format[JwtToken]
 
     private val authForm: Form[AuthRequest] = Form(
         mapping(
@@ -49,16 +52,14 @@ class AuthImplementation @Inject()(accountService: AccountService ,val controlle
             },
             data => {
                 accountService.register(data) match {
-                    case Left(exception) => BadRequest(Json.toJson(exception))
-                    case Right(accId) => Ok(Json.obj("account" -> accId))
+                    case Left(exception) => exceptionToResult(exception)
+                    case Right(jwt) => Ok(Json.toJson(jwt))
                 }
-
             }
         )
     }
 
     override def login: Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
-
         authForm.bindFromRequest().fold(
             errors => {
                 errors.errors.foreach(println)
@@ -66,8 +67,8 @@ class AuthImplementation @Inject()(accountService: AccountService ,val controlle
             },
             data => {
                 accountService.logIn(data) match {
-                    case Right(exception) => BadRequest(Json.toJson(exception))
-                    case Left(acc) => Ok(Json.toJson(acc))
+                    case Right(jwt) => Ok(Json.toJson(jwt))
+                    case Left(exception) => exceptionToResult(exception)
                 }
             }
         )
@@ -80,9 +81,27 @@ class AuthImplementation @Inject()(accountService: AccountService ,val controlle
                 BadRequest("Error!")
             },
             data => {
-                accountService.googleLogin(data)
-                Ok("Yikes!")
+                accountService.googleLogin(data) match {
+                    case Left(exception) => exceptionToResult(exception)
+                    case Right(token) => Ok(Json.toJson(token))
+                }
             }
         )
+    }
+
+
+    private def exceptionToResult(exception: AccountException): Result = {
+        exception match {
+            case e: AccountNotFoundException => NotFound(Json.toJson(exception))
+            case e: AppTackConfigurationException => BadRequest(Json.toJson(exception))
+            case e: InvalidCredentialsException => Unauthorized(Json.toJson(exception))
+            case e: MalformedAppleTokenException => BadRequest(Json.toJson(exception))
+            case e: MalformedGoogleTokenException => BadRequest(Json.toJson(exception))
+            case e: ResourceNotFoundException => NotFound(Json.toJson(exception))
+            case e: UnknownException => InternalServerError(Json.toJson(exception))
+            case e: UserAlreadyExistsException => Conflict(Json.toJson(exception))
+            case e: UserNotFoundException => NotFound(Json.toJson(exception))
+            case _ => InternalServerError(Json.toJson(exception))
+        }
     }
 }

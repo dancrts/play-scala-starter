@@ -1,12 +1,9 @@
 package services.messages
 
-
-
+import java.util.{UUID, Date}
 import javax.inject.{Inject, Singleton}
 import dao.{ConversationDAO, MessageDAO}
 import models.{Conversation, Message}
-
-import java.util.{UUID, Date}
 
 @Singleton
 class MessageService @Inject()(messageDAO: MessageDAO, conversationDAO: ConversationDAO) {

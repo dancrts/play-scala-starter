@@ -92,7 +92,7 @@ class AccountService @Inject()(accountDAO: AccountDAO, apptackClient: ApptackCli
             case ApptackExceptions.UserAlreadyExistsException(userResource) =>      UserAlreadyExistsException(userResource)
             case ApptackExceptions.UnknowException(resource) =>                     UnknownException(resource)
             case ApptackExceptions.MalformedGoogleTokenException(googleToken) =>    MalformedGoogleTokenException(googleToken)
-            case ApptackExceptions.MalformedAppleTokenException(appleToken) =>      MalformedGoogleTokenException(appleToken)
+            case ApptackExceptions.MalformedAppleTokenException(appleToken) =>      MalformedAppleTokenException(appleToken)
             case ApptackExceptions.ApptackConfigurationException(resource) =>       AppTackConfigurationException(resource)
             case ApptackExceptions.ResourceNotFoundException(resource) =>           ResourceNotFoundException(resource)
         }
