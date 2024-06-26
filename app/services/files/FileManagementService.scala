@@ -1,7 +1,7 @@
 package services.files
 
 import com.qrsof.libs.storage.{NewResource, ResourceKey, StorageService, UpdateResource}
-import io.scalaland.chimney.dsl.TransformationOps
+import io.scalaland.chimney.dsl.into
 import org.apache.pekko.http.scaladsl.common.StrictForm.FileData
 import services.files.dto.{FileKey, FileResource, UpdatedFileResource}
 

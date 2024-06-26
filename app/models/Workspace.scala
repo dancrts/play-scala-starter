@@ -9,6 +9,5 @@ object Workspace {
     def unapply(w: Workspace): Option[(UUID, String, Option[String], Option[UUID], String, Date, Date)] =
         Some((w.key, w.name, w.description, w.imageKey, w.color, w.modifiedAt, w.createdAt))
 
-    def tupled: ((UUID, String, Option[String], Option[UUID], String, Date, Date)) =>
-        Workspace = (this.apply _).tupled
+    def tupled: ((UUID, String, Option[String], Option[UUID], String, Date, Date)) => Workspace = (this.apply _).tupled
 }

@@ -6,4 +6,8 @@ case class ProfileForm(
                           lastName: String,
                           profileURL: Option[String]
                       )
-
+object ProfileForm {
+    
+    def unapply(prof: ProfileForm): Option[(String, String, String, Option[String])] =
+        Some((prof.userKey, prof.firstName, prof.lastName, prof.profileURL))
+}

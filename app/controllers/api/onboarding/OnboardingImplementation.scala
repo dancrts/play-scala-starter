@@ -1,7 +1,6 @@
 package controllers.api.onboarding
 
-import io.scalaland.chimney.dsl.TransformationOps
-
+import io.scalaland.chimney.dsl.{transformInto, into}
 import javax.inject.{Inject, Singleton}
 import org.apache.pekko.http.scaladsl.common.StrictForm
 import org.apache.pekko.http.scaladsl.model.{ContentType, ContentTypes, HttpEntity}
@@ -10,8 +9,8 @@ import play.api.mvc._
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.libs.Files
-import services.credentials.CredentialService
 
+import services.credentials.CredentialService
 import services.onboarding.OnboardingService
 import services.onboarding.dto.forms._
 import services.onboarding.dto.requests._
@@ -82,7 +81,7 @@ class OnboardingImplementation @Inject()(
             workspace => {
                 val workspaceToCreate: WorkspaceRequest = workspace.into[WorkspaceRequest].withFieldConst(_.icon, workspaceIcon).transform
                 onboardingService.saveWorkspace(workspaceToCreate)
-                println("workspace: {}", workspaceToCreate)
+                println("workspace: " + workspaceToCreate)
                 Ok("Bien!")
             }
         )
@@ -97,7 +96,7 @@ class OnboardingImplementation @Inject()(
             }, profile => {
                 val profileToCreate: ProfileRequest = profile.into[ProfileRequest].withFieldConst(_.profileIcon, profileIcon).transform
                 onboardingService.saveProfile(profileToCreate)
-                println("profile: {}", profileToCreate)
+                println("profile: " + profileToCreate)
                 Ok("Bien")
             }
         )

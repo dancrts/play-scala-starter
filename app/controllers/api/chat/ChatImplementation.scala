@@ -13,9 +13,9 @@ class ChatImplementation @Inject()(val controllerComponents: ControllerComponent
     implicit system: ActorSystem, mat: Materializer
 ) extends ChatController with BaseController{
 
-    private val manager = system.actorOf(Props[ChatManager], "Manager")
+    private val manager = system.actorOf(Props[ChatManager](), "Manager")
 
-    def getMessage: Action[AnyContent] = Action { request: Request[AnyContent] =>
+    def getMessage: Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
         println(request.body.asJson.get)
 
         request.body.asJson match {

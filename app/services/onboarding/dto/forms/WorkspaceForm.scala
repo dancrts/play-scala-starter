@@ -6,3 +6,8 @@ case class WorkspaceForm(
                             description: Option[String],
                             color: String
                         )
+
+object WorkspaceForm {
+    def unapply(wsForm: WorkspaceForm): Option[(String, String, Option[String], String)] =
+        Some((wsForm.userKey, wsForm.name, wsForm.description, wsForm.color))
+}

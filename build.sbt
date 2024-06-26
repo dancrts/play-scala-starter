@@ -1,22 +1,21 @@
 name := """play-starter"""
 organization := "qrsof.com"
 version := "1.0-SNAPSHOT"
-//scalaVersion := "2.13.14"
- scalaVersion := "3.4.2"
+scalaVersion := "3.4.2"
 
 lazy val qrsofDependencies = Seq(
     "com.qrsof.core.api" %% "swagger" % "1.0.0-01-SNAPSHOT",
     "com.qrsof.core" %% "app-models" % "1.0.0-06-SNAPSHOT",
     "com.qrsof.core" %% "app-core" % "4.0.0-03-SNAPSHOT",
-    "com.qrsof.core" %% "app" % "1.0.0-11-SNAPSHOT",
-    "com.qrsof.core" %% "app-play" % "4.0.0-03-SNAPSHOT",
-    "com.qrsof.core" %% "api-core-play" % "4.0.0-03-SNAPSHOT",
     "com.qrsof.core" %% "json-jackson" % "1.0.0-05-SNAPSHOT",
     "com.qrsof.core" %% "jwt" % "4.0.0-01-SNAPSHOT",
     "com.qrsof.core" %% "app-core" % "3.0.0-SNAPSHOT",
     "com.qrsof.core.storage" % "storage-digital-ocean" % "2.0.0-00-SNAPSHOT",
     "com.qrsof.libs.storage" % "storage-file-system" % "2.0.0-00-SNAPSHOT",
-    "com.qrsof.apptack" %% "apptack-client" % "3.0.0-SNAPSHOT",
+    "com.qrsof.core" %% "app" % "1.0.0-11-SNAPSHOT",
+    "com.qrsof.core" %% "app-play" % "4.0.0-03-SNAPSHOT",
+    "com.qrsof.core" %% "api-core-play" % "4.0.0-03-SNAPSHOT",
+    "com.qrsof.core" %% "apptack-client" % "3.0.0-01-SNAPSHOT",
 )
 
 lazy val qrsofResolver = Seq(

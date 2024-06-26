@@ -9,6 +9,5 @@ object Message {
     def unapply(m: Message): Option[(UUID, String, UUID, UUID, Date)] =
         Some((m.key, m.content, m.senderKey, m.conversationKey, m.createdAt))
 
-    def tupled: ((UUID, String, UUID, UUID, Date)) =>
-        Message = (this.apply _).tupled
+    def tupled: ((UUID, String, UUID, UUID, Date)) => Message = (this.apply _).tupled
 }

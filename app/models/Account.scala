@@ -9,6 +9,5 @@ object Account {
     def unapply(acc: Account): Option[(UUID, String, String, String,  Option[UUID])] =
         Some((acc.accountKey, acc.fullname, acc.email, acc.password, acc.profilePic))
 
-    def tupled: ((UUID, String, String, String,  Option[UUID])) =>
-        Account = (this.apply _).tupled
+    def tupled: ((UUID, String, String, String,  Option[UUID])) => Account = (this.apply _).tupled
 }

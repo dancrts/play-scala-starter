@@ -33,7 +33,7 @@ class AccountDAO @Inject() (@NamedDatabase("chaapy") protected val dbConfigProvi
 
         def profilePic: Rep[Option[UUID]] = column[Option[UUID]]("profile_pic")
 
-        override def * : ProvenShape[Account] = (accountKey, fullname, email, password, profilePic) <> (Account.tupled, Account.unapply _)
+        override def * : ProvenShape[Account] = (accountKey, fullname, email, password, profilePic) <> (Account.tupled, Account.unapply)
     }
 
     private val accountTable = TableQuery[AccountTable]

@@ -21,72 +21,75 @@ class AuthImplementation @Inject()(accountService: AccountService ,val controlle
     implicit val formatAccount: OFormat[Account] = Json.format[Account]
     implicit val formatJwt: OFormat[JwtToken] = Json.format[JwtToken]
 
-    private val authForm: Form[AuthRequest] = Form(
-        mapping(
-            "email" -> nonEmptyText,
-            "password" -> nonEmptyText
-        )(AuthRequest.apply)(AuthRequest.unapply)
-    )
+//    private val authForm: Form[AuthRequest] = Form(
+//        mapping(
+//            "email" -> nonEmptyText,
+//            "password" -> nonEmptyText
+//        )(AuthRequest.apply)(AuthRequest.unapply _)
+//    )
 
-    private val googleLoginForm: Form[GoogleLoginRequest] = Form(
-        mapping(
-            "idToken" -> nonEmptyText,
-            "deviceInformation" -> mapping(
-                "platform" -> nonEmptyText,
-                "deviceId"-> optional(text),
-                "deviceDescription"->optional(text)
-            )(DeviceInformation.apply)(DeviceInformation.unapply),
-            "userInformation" -> mapping(
-                "email" -> nonEmptyText,
-                "name" -> nonEmptyText,
-                "photoUrl" -> nonEmptyText
-            )(UserInformation.apply)(UserInformation.unapply)
-        )(GoogleLoginRequest.apply)(GoogleLoginRequest.unapply)
-    )
+//    private val googleLoginForm: Form[GoogleLoginRequest] = Form(
+//        mapping(
+//            "idToken" -> nonEmptyText,
+//            "deviceInformation" -> mapping(
+//                "platform" -> nonEmptyText,
+//                "deviceId"-> optional(text),
+//                "deviceDescription"->optional(text)
+//            )(DeviceInformation.apply)(DeviceInformation.unapply),
+//            "userInformation" -> mapping(
+//                "email" -> nonEmptyText,
+//                "name" -> nonEmptyText,
+//                "photoUrl" -> nonEmptyText
+//            )(UserInformation.apply)(UserInformation.unapply)
+//        )(GoogleLoginRequest.apply)(GoogleLoginRequest.unapply)
+//    )
 
     override def register: Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
-        authForm.bindFromRequest().fold(
-            errors => {
-                errors.errors.foreach(println)
-                BadRequest("Error!")
-            },
-            data => {
-                accountService.register(data) match {
-                    case Left(exception) => exceptionToResult(exception)
-                    case Right(jwt) => Ok(Json.toJson(jwt))
-                }
-            }
-        )
+//        authForm.bindFromRequest().fold(
+//            errors => {
+//                errors.errors.foreach(println)
+//                BadRequest("Error!")
+//            },
+//            data => {
+//                accountService.register(data) match {
+//                    case Left(exception) => exceptionToResult(exception)
+//                    case Right(jwt) => Ok(Json.toJson(jwt))
+//                }
+//            }
+//        )
+    ???
     }
 
     override def login: Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
-        authForm.bindFromRequest().fold(
-            errors => {
-                errors.errors.foreach(println)
-                BadRequest("Error!")
-            },
-            data => {
-                accountService.logIn(data) match {
-                    case Right(jwt) => Ok(Json.toJson(jwt))
-                    case Left(exception) => exceptionToResult(exception)
-                }
-            }
-        )
+//        authForm.bindFromRequest().fold(
+//            errors => {
+//                errors.errors.foreach(println)
+//                BadRequest("Error!")
+//            },
+//            data => {
+//                accountService.logIn(data) match {
+//                    case Right(jwt) => Ok(Json.toJson(jwt))
+//                    case Left(exception) => exceptionToResult(exception)
+//                }
+//            }
+//        )
+???
     }
 
     override def loginWithGoogle: Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
-        googleLoginForm.bindFromRequest().fold(
-            errors => {
-                println(errors.errors.toString())
-                BadRequest("Error!")
-            },
-            data => {
-                accountService.googleLogin(data) match {
-                    case Left(exception) => exceptionToResult(exception)
-                    case Right(token) => Ok(Json.toJson(token))
-                }
-            }
-        )
+//        googleLoginForm.bindFromRequest().fold(
+//            errors => {
+//                println(errors.errors.toString())
+//                BadRequest("Error!")
+//            },
+//            data => {
+//                accountService.googleLogin(data) match {
+//                    case Left(exception) => exceptionToResult(exception)
+//                    case Right(token) => Ok(Json.toJson(token))
+//                }
+//            }
+//        )
+    ???
     }
 
 

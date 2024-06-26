@@ -2,9 +2,10 @@ package services.account
 
 
 import java.util.UUID
-import io.scalaland.chimney.dsl.TransformerOps
+import io.scalaland.chimney.dsl.transformInto
 import javax.inject.{Inject, Singleton}
-import com.qrsof.apptack.client.{ApptackClient, ApptackExceptions, DeviceInformation}
+import com.qrsof.apptack.client.{ApptackClient, DeviceInformation}
+import com.qrsof.apptack.client.ApptackClientExceptions
 import com.qrsof.jwt.models.{DecodedToken, JwtToken}
 import com.qrsof.jwt.validation.JwtValidationService
 import dao.AccountDAO
@@ -18,10 +19,9 @@ class AccountService @Inject()(accountDAO: AccountDAO, apptackClient: ApptackCli
     def logIn(loginReq: AuthRequest): Either[AccountException, JwtToken] = {
 
         apptackClient.oauth.login(loginReq.email, loginReq.password) match {
-            case Left(exception) => Left(convertAppTackToAuthException(exception))
+            case Left(exception) => Left(UserNotFoundException(loginReq.email))
             case Right(token) =>
                 val jwtToken: JwtToken = JwtToken(token.accessToken)
-
                 accountDAO.findAndValidate(loginReq.email, loginReq.password) match {
                     case Some(account) =>
                         println(s"found account $account")
@@ -39,7 +39,7 @@ class AccountService @Inject()(accountDAO: AccountDAO, apptackClient: ApptackCli
             username = authReq.email, password = authReq.password, None, None
         ) match {
             case Left(exception) =>
-                Left(convertAppTackToAuthException(exception))
+                Left(UserAlreadyExistsException(authReq.email))
             case Right(token) =>
 
                 val jwtToken: JwtToken =            JwtToken(token.accessToken)
@@ -62,21 +62,17 @@ class AccountService @Inject()(accountDAO: AccountDAO, apptackClient: ApptackCli
 
     def googleLogin(gLoginRequest: GoogleLoginRequest): Either[AccountException, JwtToken] = {
         val deviceInfo: DeviceInformation = gLoginRequest.deviceInformation.transformInto[DeviceInformation]
-
+        val userInfo: UserInformation = gLoginRequest.userInformation
         apptackClient.oauth.loginWithGoogle(gLoginRequest.idToken, deviceInfo) match {
-            case Left(exception) => Left(convertAppTackToAuthException(exception))
+            case Left(exception) => Left(MalformedGoogleTokenException(userInfo.email))
             case Right(token) =>
-                val jwtToken: JwtToken =            JwtToken(token.accessToken)
-                val userInfo: UserInformation =     gLoginRequest.userInformation
-
+                val jwtToken: JwtToken = JwtToken(token.accessToken)
                 accountDAO.findByEmail(userInfo.email) match {
                     case Some(account) => println(account)
                     case None =>
-
-                        val decodedToken: DecodedToken =        jwtService.validateJwt(jwtToken).toSeq.head
-                        val userKey: UUID =                     UUID.fromString(decodedToken.subject)
-                        val unregisteredAccount: Account =      Account(userKey, userInfo.name, userInfo.email, userInfo.email, None)
-
+                        val decodedToken: DecodedToken = jwtService.validateJwt(jwtToken).toSeq.head
+                        val userKey: UUID = UUID.fromString(decodedToken.subject)
+                        val unregisteredAccount: Account = Account(userKey, userInfo.name, userInfo.email, userInfo.email, None)
                         accountDAO.createAccount(unregisteredAccount)
                 }
                 Right(jwtToken)
@@ -84,17 +80,18 @@ class AccountService @Inject()(accountDAO: AccountDAO, apptackClient: ApptackCli
 
     }
 
-    private def convertAppTackToAuthException(appManagerException: ApptackExceptions): AccountException = {
-        appManagerException match {
-            case ApptackExceptions.AppNotFoundException(value) =>                   AppNotFoundException(value)
-            case ApptackExceptions.UserNotFoundException(value) =>                  AccountNotFoundException(value)
-            case ApptackExceptions.UserCredentialsException(userResource) =>        InvalidCredentialsException(userResource)
-            case ApptackExceptions.UserAlreadyExistsException(userResource) =>      UserAlreadyExistsException(userResource)
-            case ApptackExceptions.UnknowException(resource) =>                     UnknownException(resource)
-            case ApptackExceptions.MalformedGoogleTokenException(googleToken) =>    MalformedGoogleTokenException(googleToken)
-            case ApptackExceptions.MalformedAppleTokenException(appleToken) =>      MalformedAppleTokenException(appleToken)
-            case ApptackExceptions.ApptackConfigurationException(resource) =>       AppTackConfigurationException(resource)
-            case ApptackExceptions.ResourceNotFoundException(resource) =>           ResourceNotFoundException(resource)
-        }
-    }
+//    private def convertAppTackToAuthException(appManagerException: ApptackClientExceptions): AccountException = {
+//        appManagerException match {
+//            case ApptackClientException.AppNotFoundException(value) =>                   AppNotFoundException(value)
+//            case ApptackExceptions.UserNotFoundException(value) =>                  AccountNotFoundException(value)
+//            case ApptackExceptions.UserCredentialsException(userResource) =>        InvalidCredentialsException(userResource)
+//            case ApptackExceptions.UserAlreadyExistsException(userResource) =>      UserAlreadyExistsException(userResource)
+//            case ApptackExceptions.UnknowException(resource) =>                     UnknownException(resource)
+//            case ApptackExceptions.MalformedGoogleTokenException(googleToken) =>    MalformedGoogleTokenException(googleToken)
+//            case ApptackExceptions.MalformedAppleTokenException(appleToken) =>      MalformedAppleTokenException(appleToken)
+//            case ApptackExceptions.ApptackConfigurationException(resource) =>       AppTackConfigurationException(resource)
+//            case ApptackExceptions.ResourceNotFoundException(resource) => ResourceNotFoundException(resource)
+//
+//        }
+//    }
 }
