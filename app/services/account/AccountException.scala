@@ -10,6 +10,21 @@ object AccountException {
 
     def unapply(accEx: AccountException): Option[ErrorCode] = Some(accEx.errorCode)
 
+    //    def convertAppTackToAccountException(appManagerException: ApptackExceptions): AccountException = {
+    //        appManagerException match {
+    //            case ApptackExceptions.AppNotFoundException(value) =>                   AppNotFoundException(value)
+    //            case ApptackExceptions.UserNotFoundException(value) =>                  AccountNotFoundException(value)
+    //            case ApptackExceptions.UserCredentialsException(userResource) =>        InvalidCredentialsException(userResource)
+    //            case ApptackExceptions.UserAlreadyExistsException(userResource) =>      UserAlreadyExistsException(userResource)
+    //            case ApptackExceptions.UnknownException(resource) =>                    UnknownException(resource)
+    //            case ApptackExceptions.MalformedGoogleTokenException(googleToken) =>    MalformedGoogleTokenException(googleToken)
+    //            case ApptackExceptions.MalformedAppleTokenException(appleToken) =>      MalformedAppleTokenException(appleToken)
+    //            case ApptackExceptions.ApptackConfigurationException(resource) =>       AppTackConfigurationException(resource)
+    //            case ApptackExceptions.ResourceNotFoundException(resource) =>           ResourceNotFoundException(resource)
+    //
+    //        }
+    //    }
+
     case class AccountNotFoundException(resource: String) extends AccountException(AccountNotFound(resource))
 
     case class AppNotFoundException(appKey: String) extends AccountException(AppNotFound(appKey))
@@ -29,6 +44,8 @@ object AccountException {
     case class UserAlreadyExistsException(username: String) extends AccountException(UserAlreadyExists(username))
 
     case class UserNotFoundException(username: String) extends AccountException(UserNotFound(username))
+
+    
 }
 
 object AccountErrorCodes {

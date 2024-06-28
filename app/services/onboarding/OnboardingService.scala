@@ -4,17 +4,19 @@ import com.qrsof.apptack.client.ApptackClient
 import io.scalaland.chimney.dsl.{into, transformInto}
 
 import javax.inject.{Inject, Singleton}
-import java.util.UUID
+import java.util.{Date, UUID}
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.concurrent.duration.Duration
 import scala.util.Try
-import play.api.libs.json.{JsValue, JsObject}
+import play.api.libs.json.{JsObject, JsValue, Json}
 import dao.{AccountDAO, WorkspaceDAO}
-import models.Workspace
+import models.{Account, Response, Workspace}
+import services.account.AccountException
 import services.files.FileManagementService
 import services.files.dto.FileKey
 import services.onboarding.dto.requests.*
 import services.onboarding.dto.responses.UserOnboardingResponse
+import services.workspaces.WorkspaceException
 
 //@Singleton
 class OnboardingService @Inject()(
@@ -24,9 +26,9 @@ class OnboardingService @Inject()(
                                      appTackClient: ApptackClient
                                  )(implicit ex: ExecutionContext) {
 
-    def getUserMetadata(userKey: String): Either[String, UserOnboardingResponse] = {
+    def getUserMetadata(userKey: String): Either[AccountException, UserOnboardingResponse] = {
         appTackClient.users.findUserByKey(userKey) match {
-            case Left(exception) => Left("error")
+            case Left(exception) => Left(AccountException.UserNotFoundException(userKey))
             case Right(user) =>
                 user.metadata match {
                     case Some(metadata) =>
@@ -37,55 +39,51 @@ class OnboardingService @Inject()(
                                 pictureURL = getJsObjectValue(metadata, "pictureUrl")
                             )
                         )
-                    case None => Left("error")
+                    case None => Left(AccountException.UnknownException(userKey))
                 }
         }
-//        ???
     }
 
-    def saveWorkspace(workspaceRequest: WorkspaceRequest): Either[String, Nothing] = {
+    def saveWorkspace(workspaceRequest: WorkspaceRequest): Either[WorkspaceException, Response] = {
         appTackClient.users.accounts.get(workspaceRequest.userKey) match {
-            case Left(value) => Left("Error")
+            case Left(value) => Left(WorkspaceException.AccountDoesNotExistsException(workspaceRequest.userKey))
             case Right(accounts) =>
                 val workspaceKey = accounts.head.accountKey
                 val maybeWorkspaceIconKey: Option[FileKey] = Await.result(saveWorkspaceIcon(workspaceRequest), Duration.Inf)
 
                 val newWorkspace: Workspace = workspaceRequest.into[Workspace]
                     .withFieldConst(_.imageKey, optionStrToUUID(maybeWorkspaceIconKey.map(_.key)))
-                    .withFieldConst(_.key, UUID.fromString(workspaceKey)).transform
-
-                Right(workspaceDAO.createWorkspace(newWorkspace))
+                    .withFieldConst(_.key, UUID.fromString(workspaceKey))
+                    .withFieldConst(_.createdAt, new Date())
+                    .withFieldConst(_.modifiedAt, new Date())
+                    .transform
+                val createdWs = workspaceDAO.createWorkspace(newWorkspace)
+                Right(Response(createdWs.key.toString, Some("Workspace created successfully")))
         }
     }
 
-    def saveProfile(profileRequest: ProfileRequest) = {
+    def saveProfile(profileRequest: ProfileRequest): Either[AccountException, Response] = {
         val fullName = profileRequest.firstName + " " + profileRequest.lastName
         val maybeProfileIconKey: Option[String] = Await.result(saveProfileIcon(profileRequest), Duration.Inf)
         val metadata = formatMetadata(fullName, maybeProfileIconKey)
-        appTackClient.users.updateUserMetadata(profileRequest.userKey, metadata) match
-            case Left(exception) =>
-                println(exception)
-            case Right(value) =>
-                println(value)
-//        appTackClient.users.updateUserMetadataTupled(profileRequest.userKey, metadata: _ *) match {
-//            case Left(exception) =>
-//                throw new RuntimeException("Something went wrong: " + exception.toString)
-//            case Right(value) =>
-//                println(value)
-//        }
-        accountDAO.findByKey(UUID.fromString(profileRequest.userKey)) match {
-            case Some(account) =>
-                val updatedAccount = account.copy(fullname = fullName, profilePic = optionStrToUUID(maybeProfileIconKey))
-                val updatedResult = Await.result(accountDAO.updateAccount(updatedAccount), Duration.Inf)
-                updatedResult match {
-                    case 1 => println("it worked!")
-                    case _ => println("it didn't work")
+        appTackClient.users.updateUserMetadata(profileRequest.userKey, metadata) match {
+            case Left(exception) => Left(AccountException.UserNotFoundException(profileRequest.userKey))
+            case Right(userKey) =>
+                accountDAO.findByKey(UUID.fromString(userKey.key)) match {
+                    case Some(account) =>
+                        val updatedAccount = account.copy(fullname = fullName, profilePic = optionStrToUUID(maybeProfileIconKey))
+                        val updatedResult = Await.result(accountDAO.updateAccount(updatedAccount), Duration.Inf)
+                        updatedResult match {
+                            case 1 => Right(Response(account.accountKey.toString, Some("User profile updated successfully")))
+                            case _ => Left(AccountException.UnknownException(profileRequest.userKey))
+                        }
+                    case None =>
+                        Left(AccountException.UserNotFoundException(profileRequest.userKey))
                 }
-            case None =>
-                //this should return an exception
-                println("None")
+                
         }
-        ???
+        
+        
     }
 
 
@@ -109,12 +107,12 @@ class OnboardingService @Inject()(
     }
 
     private def formatMetadata(fullName: String, icon: Option[String]): JsObject = {
-        ???
+        Json.obj("" -> fullName, "" -> icon)
     }
 
     private def getJsObjectValue(jsonObject: JsObject, field: String): String = {
-        val jsValue = jsonObject.value(field)
-        jsValue.toString
+        val jsValue = jsonObject.value(field).toString
+        println(jsValue)
         ???
     }
 

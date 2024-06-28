@@ -5,7 +5,24 @@ import services.workspaces.WorkspaceErrorCodes._
 
 abstract class WorkspaceException(val errorCode: ErrorCode) {}
 
-object WorkspaceExceptions {
+object WorkspaceException {
+
+    def apply(errorCode: ErrorCode): WorkspaceException = new WorkspaceException(errorCode) {}
+
+    def unapply(wsEx: WorkspaceException): Option[ErrorCode] = Some(wsEx.errorCode)
+
+    //    def convertAppTackToWorkspaceException(appManagerException: ApptackExceptions): AccountException = {
+    //        appManagerException match {
+    //            case ApptackExceptions.UserNotFoundException(value) =>                  AccountDoesNotExistsException(value)
+    //            case ApptackExceptions.UserCredentialsException(userResource) =>        UnconfirmedUserException(userResource)
+    //            case ApptackExceptions.UnknownException(resource) =>                    UnknownException(resource)
+    //            case ApptackExceptions.ApptackConfigurationException(resource) =>       UnknownException(resource)
+    //            case ApptackExceptions.ResourceNotFoundException(resource) =>           WorkspaceNotFoundException(resource)
+    //        }
+    //    }
+    
+    case class AccountDoesNotExistsException(key: String) extends  WorkspaceException(AccountDoesNotExists(key))
+    
     case class WorkspaceAlreadyExistsException(name: String) extends WorkspaceException(WorkspaceAlreadyExists(name))
 
     case class WorkspaceNotFoundException(workspaceKey: String) extends WorkspaceException(WorkspaceNotFound(workspaceKey))
@@ -23,6 +40,12 @@ object WorkspaceExceptions {
 
 
 object WorkspaceErrorCodes {
+    case class AccountDoesNotExists(key: String) extends ErrorCode {
+        override val code: String = "AU00"
+        override val title: String = "Account doesn't exists"
+        override val detail: Option[String] = Some(key)
+    }
+    
     case class WorkspaceAlreadyExists(name: String) extends ErrorCode {
         override val code: String = "AU01"
         override val title: String = "Workspace already exists"

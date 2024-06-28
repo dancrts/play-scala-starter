@@ -40,7 +40,7 @@ class WorkspaceDAO @Inject()(@NamedDatabase("chaapy") protected val dbConfigProv
 
     private val workspaceTable = TableQuery[WorkspaceTable]
 
-    def createWorkspace(workspace: Workspace) = ???
+    def createWorkspace(workspace: Workspace): Workspace = ???
 
     def updateWorkspace(workspace: Workspace) = ???
 

@@ -51,14 +51,13 @@ class ConversationDAO @Inject()(@NamedDatabase("chaapy") protected val dbConfigP
 
     def findByUser(participant: UUID): Seq[Conversation] = {
         implicit val getResultConversations: GetResult[Conversation] = formatGetResult
-
-        val searchQuery = sql"""SELECT * FROM "conversations" WHERE participant1 = '$participant' OR participant2 = '$participant'""".as[Conversation]
+        val searchQuery = sql"""SELECT * FROM "conversations" WHERE participant1 = '${participant.toString}' OR participant2 = '${participant.toString}'""".as[Conversation]
         Await.result(db.run(searchQuery), Duration.Inf)
     }
     
     def findByBothUsers(user1: UUID, user2: UUID): Seq[Conversation] = {
         implicit val getResultConversations: GetResult[Conversation] = formatGetResult
-        val searchQuery = sql"""SELECT FROM "conversations" WHERE (participant1 = '$user1' AND participant2 = '$user2') OR ((participant1 = '$user2' AND participant2 = '$user1')) """.as[Conversation]
+        val searchQuery = sql"""SELECT FROM "conversations" WHERE (participant1 = '${user1.toString}' AND participant2 = '${user2.toString}') OR ((participant1 = '${user2.toString}' AND participant2 = '${user1.toString}')) """.as[Conversation]
         Await.result(db.run(searchQuery),Duration.Inf)
     }
 

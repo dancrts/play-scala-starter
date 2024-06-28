@@ -12,15 +12,15 @@ import dao.AccountDAO
 import models.Account
 import services.account.dto.{AuthRequest, GoogleLoginRequest, UserInformation}
 import services.account.AccountException._
+import services.account.AccountException
 
 @Singleton
 class AccountService @Inject()(accountDAO: AccountDAO, apptackClient: ApptackClient, jwtService: JwtValidationService) {
 
     def logIn(loginReq: AuthRequest): Either[AccountException, JwtToken] = {
-
         apptackClient.oauth.login(loginReq.email, loginReq.password) match {
             case Left(exception) => Left(UserNotFoundException(loginReq.email))
-            case Right(token) =>
+            case Right(token) => {
                 val jwtToken: JwtToken = JwtToken(token.accessToken)
                 accountDAO.findAndValidate(loginReq.email, loginReq.password) match {
                     case Some(account) =>
@@ -29,23 +29,20 @@ class AccountService @Inject()(accountDAO: AccountDAO, apptackClient: ApptackCli
                     case None =>
                         Left(InvalidCredentialsException(loginReq.email))
                 }
+            }
         }
-
     }
 
     def register(authReq: AuthRequest): Either[AccountException, JwtToken] = {
-
         apptackClient.oauth.register(
             username = authReq.email, password = authReq.password, None, None
         ) match {
-            case Left(exception) =>
-                Left(UserAlreadyExistsException(authReq.email))
-            case Right(token) =>
-
-                val jwtToken: JwtToken =            JwtToken(token.accessToken)
-                val decodedToken: DecodedToken =    jwtService.validateJwt(jwtToken).toSeq.head
-                val userKey: UUID =                 UUID.fromString(decodedToken.subject)
-                val newAccount: Account =           Account(userKey, authReq.email, authReq.email, authReq.password, None)
+            case Left(exception) => Left(UserAlreadyExistsException(authReq.email))
+            case Right(token) => {
+                val jwtToken: JwtToken = JwtToken(token.accessToken)
+                val decodedToken: DecodedToken = jwtService.validateJwt(jwtToken).toSeq.head
+                val userKey: UUID = UUID.fromString(decodedToken.subject)
+                val newAccount: Account = Account(userKey, authReq.email, authReq.email, authReq.password, None)
 
                 accountDAO.findByEmail(authReq.email) match {
                     case Some(foundAcc) =>
@@ -54,10 +51,8 @@ class AccountService @Inject()(accountDAO: AccountDAO, apptackClient: ApptackCli
                         accountDAO.createAccount(newAccount)
                         Right(jwtToken)
                 }
+            }
         }
-
-
-
     }
 
     def googleLogin(gLoginRequest: GoogleLoginRequest): Either[AccountException, JwtToken] = {
@@ -65,7 +60,7 @@ class AccountService @Inject()(accountDAO: AccountDAO, apptackClient: ApptackCli
         val userInfo: UserInformation = gLoginRequest.userInformation
         apptackClient.oauth.loginWithGoogle(gLoginRequest.idToken, deviceInfo) match {
             case Left(exception) => Left(MalformedGoogleTokenException(userInfo.email))
-            case Right(token) =>
+            case Right(token) => {
                 val jwtToken: JwtToken = JwtToken(token.accessToken)
                 accountDAO.findByEmail(userInfo.email) match {
                     case Some(account) => println(account)
@@ -76,22 +71,7 @@ class AccountService @Inject()(accountDAO: AccountDAO, apptackClient: ApptackCli
                         accountDAO.createAccount(unregisteredAccount)
                 }
                 Right(jwtToken)
+            }
         }
-
     }
-
-//    private def convertAppTackToAuthException(appManagerException: ApptackClientExceptions): AccountException = {
-//        appManagerException match {
-//            case ApptackClientException.AppNotFoundException(value) =>                   AppNotFoundException(value)
-//            case ApptackExceptions.UserNotFoundException(value) =>                  AccountNotFoundException(value)
-//            case ApptackExceptions.UserCredentialsException(userResource) =>        InvalidCredentialsException(userResource)
-//            case ApptackExceptions.UserAlreadyExistsException(userResource) =>      UserAlreadyExistsException(userResource)
-//            case ApptackExceptions.UnknowException(resource) =>                     UnknownException(resource)
-//            case ApptackExceptions.MalformedGoogleTokenException(googleToken) =>    MalformedGoogleTokenException(googleToken)
-//            case ApptackExceptions.MalformedAppleTokenException(appleToken) =>      MalformedAppleTokenException(appleToken)
-//            case ApptackExceptions.ApptackConfigurationException(resource) =>       AppTackConfigurationException(resource)
-//            case ApptackExceptions.ResourceNotFoundException(resource) => ResourceNotFoundException(resource)
-//
-//        }
-//    }
 }
